@@ -1,7 +1,8 @@
 clc
 clear all
 
-global p01 p12 p23 p3T
+global p01 p12 p23 p3T robot
+robot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
 
 p01 = [0;0;0];
 p12 = [0;0;0];

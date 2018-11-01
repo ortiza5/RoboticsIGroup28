@@ -1,8 +1,8 @@
 robot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
 
-start_angles = int16( [250 0 0  0] );
+start_angles = int16( [20 0 0  0] );
 robot.setJointPositions(start_angles(1),start_angles(2),start_angles(3),start_angles(4));
-pause(5);
+pause(3);
 
 disp 'Going into twitch loop'
 a = 0; b = 10;
