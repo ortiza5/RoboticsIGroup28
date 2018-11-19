@@ -10,12 +10,16 @@ from DobotStatusMessage import DobotStatusMessage
 import binascii
 import datetime
 import sys
+import RobotRaconteur as RR
+
+
+RRN = RR.RobotRaconteurNode.s
 
 def f2b(i):
     return struct.pack('<f', i)
 
 
-class DobotSerialInterface:
+class DobotSerialInterface(object):
 
     serial_connection = None
     read_buffer = deque()
@@ -25,7 +29,7 @@ class DobotSerialInterface:
     MOVE_MODE_JOINTS = 1  # joints move independent
     MOVE_MODE_LINEAR = 2  # linear movement
 
-    def __init__(self, port_name='COM4', baud_rate=9600):
+    def __init__(self, port_name='/dev/ttyACM0', baud_rate=9600):
         thread.start_new_thread(self.read_loop, ())
         self.connect(port_name, baud_rate)
 
@@ -36,7 +40,7 @@ class DobotSerialInterface:
             self.serial_connection.close()
 
 
-    def connect(self, port_name='COM4', baud_rate=9600):
+    def connect(self, port_name='/dev/ttyACM0', baud_rate=9600):
         self.serial_connection = None
         try:
             self.serial_connection = serial.Serial(
@@ -80,7 +84,7 @@ class DobotSerialInterface:
         self.serial_connection.write(cmd_str)
         # print "sending", binascii.b2a_hex(cmd_str)
 
-    def _send_absolute_command(self, cartesian, p1, p2, p3, p4, move_mode):
+    def _send_absolute_command(self, cartesian, p1, p2, p3, p4,grip, move_mode):
         # global cmd_str_10
         cmd_str_10 = [0]*10
         cmd_str_10[0] = 3 if cartesian else 6  # position or angles
@@ -89,15 +93,23 @@ class DobotSerialInterface:
         cmd_str_10[4] = p3
         cmd_str_10[5] = p4
         cmd_str_10[7] = move_mode
+        cmd_str_10[8] = grip
         self._send_command(cmd_str_10)
+    
+    def setAbsolutePosition(self, cartesian, p1, p2, p3, p4):
+        self._send_absolute_command(cartesian, p1, p2, p3, p4)
 
-    def send_absolute_position(self, x, y, z, rot, move_mode=MOVE_MODE_LINEAR):
+    def send_absolute_position(self, x, y, z, rot,grip, move_mode=MOVE_MODE_JOINTS):
         print "sending position %f %f %f" % (x, y, z)
-        self._send_absolute_command(True, x, y, z, rot, move_mode)
+        self._send_absolute_command(True, x, y, z, rot,grip, move_mode)
 
-    def send_absolute_angles(self, base, rear, front, rot,  move_mode=MOVE_MODE_LINEAR):
+    def setJointPositions(self, base, rear, front, rot, grip):
+        self.send_absolute_angles(base, rear, front, rot, grip)
+
+
+    def send_absolute_angles(self, base, rear, front, rot, grip, move_mode=MOVE_MODE_JOINTS):
         # todo: assertions for ranges
-        self._send_absolute_command(False, base, rear, front, rot,  move_mode)
+        self._send_absolute_command(False, base, rear, front, rot, grip, move_mode)
 
     def set_initial_angles(self, rear_arm_angle, front_arm_angle):
         print 'setting angles to', rear_arm_angle, front_arm_angle
@@ -145,9 +157,16 @@ class DobotSerialInterface:
         cmd_str_10[7] = 1000  # LinearAcc
         self._send_command(cmd_str_10)
 
+    def getJointPositions(self):
+        return self.current_status.angles
+    def getPositions(self):
+        return self.current_status.position
+    def getGripperAngle(self):
+        return self.current_status.gripperAngle
 
     def read_loop(self):
         #print "Entering loop"
+
         cnt = 0
 
         while True:
@@ -209,9 +228,31 @@ class DobotSerialInterface:
                 # print cnt
 
 
-# def dobot_cmd_send_9():
-#     # global cmd_str_10
+def main():    
 
-#
-#
-# def dobot_cmd_send_10(VelRat=100, AccRat=100):
+    port = 10001       
+    t1 = RR.LocalTransport()
+    t1.StartServerAsNodeName("dobotRR")
+    RRN.RegisterTransport(t1)
+
+    t2 = RR.TcpTransport()
+    t2.EnableNodeAnnounce()
+    t2.StartServer(port)
+    RRN.RegisterTransport(t2)
+    
+    my_dobot = DobotSerialInterface('COM3')
+
+    with open('dobotRR.robodef', 'r') as f:
+        service_def = f.read()
+    
+    RRN.RegisterServiceType(service_def)
+    RRN.RegisterService("dobotController", "dobotRR.DobotSerialInterface", my_dobot)
+    print "Conect string: tcp://localhost:" + str(port) + "/dobotRR/dobotController"
+    raw_input("Press any key to end")
+
+    RRN.Shutdown()
+
+
+if __name__ == '__main__':
+    main()
+
