@@ -12,7 +12,7 @@ global robot
 % robot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
 desired_angles = int16(rad2deg(desired_angles));
 if ~isempty(desired_angles)
-    robot.setJointPositions(desired_angles(1),desired_angles(2),desired_angles(3),int16(0));
+    robot.setJointPositions(desired_angles(1),desired_angles(2),desired_angles(3),int16(0),int16(0));
     pause(delay_seconds);
 end
 actual_angles = robot.getJointPositions();
