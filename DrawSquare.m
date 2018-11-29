@@ -1,41 +1,27 @@
 clc
 clear all
 
-global p01 p12 p23 p3T robot
-robot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
+dobot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
 
+% get Dobot angles when pen is at center position
+angles = GetDobotAngles(dobot);
 
-p01 = [0;0;0];
-p12 = [0;0;0];
-p23 = [0;0;13.5];
-p3T = [0;16;0];
+% set offset so that pen starting position is [0;0;0]
+% desired = DobotForwardKinematics(angles) + offset
+offset = [0;0;0] - DobotForwardKinematics(angles)
 
-% get Dobot angles when pen is on paper, to find p01 (center xyz about
-% calibration point)
-angles = SetDobotAngles([], 0);
-p0Tminusp01 = DobotForwardKinematics(angles);
-p01 = -p0Tminusp01;
+desired = [2;0;0];
+angles = DobotInverseKinematics(desired-offset,angles);
+SetDobotAngles(dobot,angles,3);
 
-angles = DobotInverseKinematics([2;2;0], angles);
-DobotForwardKinematics(angles)
-SetDobotAngles(angles, 3)
+desired = [0;2;0];
+angles = DobotInverseKinematics(desired-offset,angles);
+SetDobotAngles(dobot,angles,3);
 
-% angles = DobotInverseKinematics([-2;2;0], angles);
-% DobotForwardKinematics(angles)
-% SetDobotAngles(angles, 3)
-% 
-% angles = DobotInverseKinematics([-2;-2;0], angles);
-% DobotForwardKinematics(angles)
-SetDobotAngles([200,20,110,0,0], 3)
-% 
-% for i = linspace(-45,45,10)
-%     for j = linspace(-45,45,10)
-%         for k = linspace(-45,45,10)
-%             SetDobotAngles([i j k],2)
-%         end
-%     end
-% end
+desired = [0;-2;0];
+angles = DobotInverseKinematics(desired-offset,angles);
+SetDobotAngles(dobot,angles,3);
 
-% angles = DobotInverseKinematics([2;-2;0], angles);
-% DobotForwardKinematics(angles)
-% SetDobotAngles(angles, 3)
+desired = [-2;0;0];
+angles = DobotInverseKinematics(desired-offset,angles);
+SetDobotAngles(dobot,angles,3);

@@ -9,6 +9,10 @@ function actual_angles = SetDobotAngles(dobot, desired_angles, delay_seconds)
 
 desired_angles = int16(desired_angles);
 
+if nargin == 3
+    
+end
+
 dobot.setJointPositions(desired_angles(1),desired_angles(2),desired_angles(3),int16(0),int16(0));
 pause(delay_seconds);
 
