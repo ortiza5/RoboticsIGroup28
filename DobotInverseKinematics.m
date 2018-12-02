@@ -10,7 +10,7 @@ function [viable_angles] = DobotInverseKinematics(p0T, previous_angles)
 assert(length(p0T) == 3, 'Error: You need to give desired xyz coordinates')
 
 ex = [1;0;0]; ey = [0;1;0]; ez = [0;0;1];
-l1 = 10.3; l2 = 13.5; l3 = 16.0; l4 = 5.6; l5 = 11.5;
+l1 = 103; l2 = 135; l3 = 160; l4 = 56; l5 = 115;
 
 viable_angles = [];
 
@@ -18,9 +18,9 @@ viable_angles = [];
 %   theta = subproblem4(p, q, k, d)
 %   solve for theta when static displacement from rotation axis from
 %   d=p'*rot(k,theta)*q
-%   ex'*l2*ez + ex'*l3*ey + ex'*[0;l4;-l5] = ex'*rot(ez,-q1)*(p0T - l1*ez)
-d = ex'*l2*ez + ex'*l3*ey + ex'*[0;l4;-l5];
-p = ex;
+%   ey'*rot(ez,q1)'*(p0T - l1*ez) = ey'*l2*ez + ey'*l3*ey + ey'*[l4;0;-l5]
+d = ey'*l2*ez + ey'*l3*ex + ey'*[l4;0;-l5];
+p = ey;
 k = ez;
 q = p0T - l1*ez;
 
@@ -31,23 +31,23 @@ for q1 = q1vec'
     %   
     %   solve for theta in an elbow joint according to
     %   || q - rot(k, theta)*p || = d
-    %   || l2*ez - rot(-ex,q3-q2)*-l3*ey || = || rot(ez,q1)'*(p0T - l1*ez) - [0;l4;-l5] ||
+    %   || l2*ez + rot(ey,q3-q2)*l3*ex || = || rot(ez,q1)'*(p0T - l1*ez) - [l4;0;-l5] ||
     q = l2*ez;
-    k = -ex;
-    p = -l3*ey;
-    d = norm(rot(ez,q1)'*(p0T - l1*ez) - [0;l4;-l5]);
+    k = ey;
+    p = -l3*ex;
+    d = norm(rot(ez,q1)'*(p0T - l1*ez) - [l4;0;-l5]);
     q3minus2vec = mod(subproblem3(p,q,k,d)+pi,2*pi)-pi; % fit to range [-pi,pi)
-    
+   
     for q3minus2 = q3minus2vec'
         % SUBPROBLEM1
         %   theta=subproblem1(p, q, k)
         %
         % solve for theta according to
         %   q = rot(k, theta)*p
-        %   rot(ez,q1)'*(p0T - l1*ez) - [0;l4;-l5] = rot(-ex,q2)*( l2*ez + rot(-ex,q3-q2)*l3*ey )
-        p = l2*ez + rot(-ex,q3minus2)*l3*ey;
-        q = rot(ez,q1)'*(p0T - l1*ez) - [0;l4;-l5];
-        k = -ex;
+        %   rot(ez,q1)'*(p0T - l1*ez) - [l4;0;-l5] = rot(ey,q2)*( l2*ez + rot(ey,q3-q2)*l3*ex )
+        p = l2*ez + rot(ey,q3minus2)*l3*ex;
+        q = rot(ez,q1)'*(p0T - l1*ez) - [l4;0;-l5];
+        k = ey;
         q2 = subproblem1(p,q,k);
 
         q3 = q3minus2+q2;
@@ -104,7 +104,7 @@ end
 % addpath('general-robotics-toolbox-master');
 % assert(length(p0T) == 3, 'Error: You need to give desired xyz coordinates')
 % 
-% ex = [1;0;0]; ey = [0;1;0]; ez = [0;0;1];
+% -ey = [1;0;0]; ex = [0;1;0]; ez = [0;0;1];
 % 
 % viable_angles = [];
 % 
@@ -112,10 +112,10 @@ end
 % %   theta = subproblem4(p, q, k, d)
 % %   solve for theta when static displacement from rotation axis from
 % %   d=p'*rot(k,theta)*q
-% p = ex;
+% p = -ey;
 % q = p0T-p01;
 % k = ez;
-% d = ex'*(p12 + p23 + p3T);
+% d = -ey'*(p12 + p23 + p3T);
 % q1vec = mod(-subproblem4(p,q,k,d)+pi,2*pi)-pi; % fit to range (-pi,pi)
 % 
 % for q1 = q1vec'
@@ -126,7 +126,7 @@ end
 %     %   || q + rot(k, theta)*p || = d
 %     p = -p3T;
 %     q = p23;
-%     k = ex;
+%     k = -ey;
 %     d = norm(rot(ez,-q1)*(p0T-p01)-p12);
 %     q2minus3vec = mod(subproblem3(p,q,k,d)+pi,2*pi)-pi;
 %     
@@ -136,9 +136,9 @@ end
 %         %
 %         % solve for theta according to
 %         %   q = rot(k, theta)*p
-%         p = p23+rot(ex,q2minus3)*p3T;
+%         p = p23+rot(-ey,q2minus3)*p3T;
 %         q = rot(ez,-q1)*(p0T-p01)-p12;
-%         k = ex;
+%         k = -ey;
 %         q2 = mod(-subproblem1(p,q,k)+pi,2*pi)-pi;
 %         
 %         q3 = mod(-q2minus3+q2+pi,2*pi)-pi;

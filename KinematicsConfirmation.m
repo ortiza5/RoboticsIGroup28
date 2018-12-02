@@ -2,8 +2,8 @@ clc
 close all
 
 % check forward and inverse kinematics give consistent results
-% q = [rand()*270-135; rand()*90-5; rand()*100-10]
-q = rand(3,1)*360-180
+q = [rand()*270-135; rand()*90-5; rand()*100-10]
+% q = rand(3,1)*360-180
 p0T = DobotForwardKinematics(q)
 
 viable_angles = DobotInverseKinematics(p0T)
