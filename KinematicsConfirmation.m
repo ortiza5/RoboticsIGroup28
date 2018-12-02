@@ -1,15 +1,21 @@
 clc
 close all
 
-global p01 p12 p23 p3T
+% check forward and inverse kinematics give consistent results
+% q = [rand()*270-135; rand()*90-5; rand()*100-10]
+q = rand(3,1)*360-180
+p0T = DobotForwardKinematics(q)
 
-p01 = [0;0;0];
-p12 = [0;0;0];
-p23 = [0;0;13.5];
-p3T = [0;16;0];
+viable_angles = DobotInverseKinematics(p0T)
+
+% check that the solutions are valid
+for i = 1:size(viable_angles,2)
+    q_viable = viable_angles(:,i);
+    assert(norm(p0T - DobotForwardKinematics(q_viable)) < 1e-10)
+end
 
 % % visualize the work space
-% size = 10000;
+% size = 100;
 % q1max = 135; q1min = -135;
 % q2max = 85; q2min = -5;
 % q3max = 90; q3min = -90;
@@ -18,47 +24,20 @@ p3T = [0;16;0];
 % Y = zeros(size,1);
 % Z = zeros(size,1);
 % 
-% for counter = 1:size
-%     q1 = deg2rad(rand(1,size)*(q1max-q1min)+q1min);
-%     q2 = deg2rad(rand(1,size)*(q2max-q2min)+q2min);
-%     q3 = deg2rad(rand(1,size)*(q3max-q3min)+q3min);
+% for i = 1:size
+%     q = [rand()*270-135; rand()*90-5; rand()*100-10];
 %     
-%     p0T = DobotForwardKinematics([q1;q2;q3]);
-%     X(counter) = p0T(1);
-%     Y(counter) = p0T(2);
-%     Z(counter) = p0T(3);
+%     p0T = DobotForwardKinematics(q);
+%     X(i) = p0T(1);
+%     Y(i) = p0T(2);
+%     Z(i) = p0T(3);
 % end
 % scatter3(X,Y,Z)
 % xlabel('x axis')
 % ylabel('y axis')
 % zlabel('z axis')
 
-% % set robot angles to q by first doing forward, then inverse kinematics
-% q = deg2rad(ones(1,3)*45)
-% p0T = DobotForwardKinematics(q)
-% 
-% viable_angles = DobotInverseKinematics(p0T)
-% 
-% % check that the solutions are valid
-% for i = 1:length(viable_angles)
-%     q_viable = viable_angles(:,i);
-%     assert(norm(p0T - DobotForwardKinematics(q_viable)) < 1e-10)
-% end
-% 
-% % find solution closest in value to previous q
-% q_fitted = mod(q+pi,2*pi)-pi;
-% min_norm = Inf;
-% min_norm_angles = Inf;
-% for i = 2:length(viable_angles)
-%     if norm(viable_angles(:,i)-q_fitted) < min_norm
-%         min_norm = norm(viable_angles(:,i)-q_fitted);
-%         min_norm_angles = viable_angles(:,i);
-%     end
-% end
-% 
-% SetDobotAngles(min_norm_angles,3)
-
-% % visualize basic angle configuration
+% % visualize basic angle configuration (not updated)
 % hold on
 % q = deg2rad([0 0 0]);
 % p_normal = p01 + rot(h1,q(1))*(p12 + rot(h2,q(2))*p23 + rot(h3,q(3))*p3T)
