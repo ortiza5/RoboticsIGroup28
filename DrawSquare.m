@@ -2,13 +2,13 @@ clc
 close all
 clear all
 
-global offset
+global offset dobot
 
-% dobot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
+dobot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController');
 
 % get Dobot angles when pen is at center position
-% angles = GetDobotAngles(dobot);
-angles = [0;45;45];
+angles = GetDobotAngles(dobot);
+% angles = [0;45;45];
 
 % set offset so that pen starting position is [0;0;0]
 % desired = DobotForwardKinematics(angles) + offset
@@ -24,9 +24,9 @@ setPosition([-50;-50;0])
 setPosition([  0;  0;0])
 
 function setPosition(desired)
-global offset
+global offset dobot
 angles = DobotInverseKinematics(desired-offset)
-% SetDobotAngles(dobot,angles,3);
+SetDobotAngles(dobot,angles,3);
 end
 
 % positions = []

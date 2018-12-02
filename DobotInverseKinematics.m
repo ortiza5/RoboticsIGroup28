@@ -10,7 +10,7 @@ function [viable_angles] = DobotInverseKinematics(p0T, previous_angles)
 assert(length(p0T) == 3, 'Error: You need to give desired xyz coordinates')
 
 ex = [1;0;0]; ey = [0;1;0]; ez = [0;0;1];
-l1 = 103; l2 = 135; l3 = 160; l4 = 56; l5 = 115;
+l1 = 103; l2 = 135; l3 = 160; l4 = 50; l5 = 155;
 
 viable_angles = [];
 

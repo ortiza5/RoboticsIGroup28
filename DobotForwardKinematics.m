@@ -11,7 +11,7 @@ ex=[1;0;0]; ey=[0;1;0]; ez=[0;0;1]; zv=[0;0;0];
 
 q = deg2rad(q);
 q1 = q(1); q2 = q(2); q3 = q(3);
-l1 = 103; l2 = 135; l3 = 160; l4 = 56; l5 = 115;
+l1 = 103; l2 = 135; l3 = 160; l4 = 50; l5 = 155;
 
 % p0T = l1*ez + rot(ez,q1)*rot(-ex,q2)*l2*ez + rot(ez,q1)*rot(-ex,q3)*l3*ey + rot(ez,q1)*[l4;0;-l5];
 p0T = l1*ez + rot(ez,q1)*rot(ey,q2)*l2*ez + rot(ez,q1)*rot(ey,q3)*l3*ex + rot(ez,q1)*[l4;0;-l5];
