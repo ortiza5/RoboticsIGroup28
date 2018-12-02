@@ -14,19 +14,23 @@ angles = GetDobotAngles(dobot);
 % desired = DobotForwardKinematics(angles) + offset
 offset = [0;0;0] - DobotForwardKinematics(angles)
 
-% make 4 inches x 4 inches square (4 inches = 50 mm)
-setPosition([-50;-50;0])
-setPosition([-50; 50;0])
-setPosition([ 50; 50;0])
-setPosition([ 50;-50;0])
-setPosition([-50;-50;0])
-% set back to original point
-setPosition([  0;  0;0])
+% % make 4 inches x 4 inches square (4 inches = 50 mm)
+% setPosition([-50;-50;0])
+% setPosition([-50; 50;0])
+% setPosition([ 50; 50;0])
+% setPosition([ 50;-50;0])
+% setPosition([-50;-50;0])
+% % set back to original point
+% setPosition([  0;  0;0])
+
+for theta = linspace(0,360,20)
+    setPosition(50*cosd(theta),50*sind(theta))
+end
 
 function setPosition(desired)
 global offset dobot
 angles = DobotInverseKinematics(desired-offset)
-SetDobotAngles(dobot,angles,3);
+SetDobotAngles(dobot,angles,0.5);
 end
 
 % positions = []
