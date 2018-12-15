@@ -23,14 +23,15 @@ offset = [0;0;0] - DobotForwardKinematics(angles)
 % % set back to original point
 % setPosition([  0;  0;0])
 
-for theta = linspace(0,360,20)
-    setPosition(50*cosd(theta),50*sind(theta))
+for theta = linspace(0,360,100)
+    setPosition([50*cosd(theta);50*sind(theta);0])
 end
+setPosition([  0;  0;0])
 
 function setPosition(desired)
 global offset dobot
 angles = DobotInverseKinematics(desired-offset)
-SetDobotAngles(dobot,angles,0.5);
+SetDobotAngles(dobot,angles,0.2);
 end
 
 % positions = []
