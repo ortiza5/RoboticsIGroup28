@@ -23,6 +23,10 @@ offset = [0;0;0] - DobotForwardKinematics(angles);
 % TODO - Raise Dobot to get a picture of the paper and setup boundary
 % ========================================================================
 
+% take image from camera and set it to raw_image
+raw_image = imread('testing.jpg');
+binary_image = ImageProcessing(raw_image);
+
 while(1)
     % Get Phantom Omni initial position to compare against
     q = callAngles(omni);
