@@ -41,7 +41,7 @@ K = cameraParams.IntrinsicMatrix';
 raw_image = imread('testing.jpg');
 
 % convert it to binary
-binary_image = ImageProcessing(raw_image);
+binary_image = ImageProcessing(raw_image, 0.5);
 
 while(1)
     % Get Phantom Omni initial position to compare against
@@ -81,7 +81,11 @@ while(1)
     
     % give torque feedback
     feedback_omni = (POT_dobotFIN - POT_dobotCLOSEST)/scale;
-    % TODO convert feedback_omni (in mm) to joint torques (using jacobian?)
+    
+    % ========================================================================
+    % TODO - convert feedback_omni (in mm) to joint torques (using
+    % jacobian?), and apply to omni
+    % ========================================================================
 end
 
 
