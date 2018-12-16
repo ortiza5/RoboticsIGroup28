@@ -20,7 +20,7 @@ v = current(2);
 for distance = 0:5:length(binary_image)
     for angle = 0:360
         test_u = u + round(distance*cosd(angle));
-        test_v = v + round(distance*sind(angle));
+        test_v = u + round(distance*sind(angle));
         
         % make sure test [u,v] are in image boundary
         if test_u >= 1 && test_u <= image_width
@@ -34,4 +34,5 @@ for distance = 0:5:length(binary_image)
         end
     end
 end
+direction = [0;0];
 end

@@ -80,9 +80,18 @@ while(1)
     setPosition(POT_dobotCLOSEST);
     
     % give torque feedback
-    feedback_omni = (POT_dobotFIN - POT_dobotCLOSEST)/scale;
-    % TODO convert feedback_omni (in mm) to joint torques (using jacobian?)
+    position_feedback = 
 end
+
+
+function p_camera = ToCameraFrame(p, pOC, ROC)
+
+end
+
+function p = FromCameraFrame(p_camera, pOC, ROC)
+
+end
+
 
 
 
