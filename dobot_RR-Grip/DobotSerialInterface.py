@@ -240,7 +240,7 @@ def main():
     t2.StartServer(port)
     RRN.RegisterTransport(t2)
     
-    my_dobot = DobotSerialInterface('COM3')
+    my_dobot = DobotSerialInterface('COM5')
 
     with open('dobotRR.robodef', 'r') as f:
         service_def = f.read()
