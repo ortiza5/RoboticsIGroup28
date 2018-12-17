@@ -45,48 +45,45 @@ binary_image = ImageProcessing(raw_image, 0.5);
 
 while(1)
     % Get Phantom Omni initial position to compare against
-    q = callAngles(omni);
+    q = omni.ActualJointAngles
     q = q(1:3);
     POT_omniINIT = OmniForwardKinematics(q);
-    
+
     % Pause to allow for movement of the Phantom Omni
     pause(.1)
-    
+
     % Get the new position of the Phantom Omni
-    q = callAngles(omni);
+    q = omni.ActualJointAngles
     q = q(1:3);
     POT_omniFIN = OmniForwardKinematics(q);
-    
+
     % Find change in Phantom Omni position
     delta_POT = scale*(POT_omniFIN - POT_omniINIT);
-    
+
     % Get new desired position of Dobot
     angles = GetDobotAngles(dobot);
     POT_dobotINIT = DobotForwardKinematics(angles);
     POT_dobotFIN = POT_dobotINIT + delta_POT;
-    
+
     % Convert dobot final position to camera frame
     pi = K*T*[POT_dobotFIN; 1];
     pixelFIN = [pi(1)/pi(3); pi(2)/pi(3)];
-    
+
     % Find closest workspace location (can be the same as current)
     pixelCLOSEST = ClosestWorkspace(pixelFIN, binary_image);
-    
+
     % Convert movement vector to world frame
     piCLOSEST = [pixelCLOSEST*pi(3); pi(3)];
     POT_dobotCLOSEST = [ROC POC]*[K\piCLOSEST; 1];
-    
+
     % move Dobot to closest position
     setPosition(POT_dobotCLOSEST);
-    
+
     % give torque feedback
     feedback_omni = (POT_dobotFIN - POT_dobotCLOSEST)/scale;
-    
+
     % ========================================================================
     % TODO - convert feedback_omni (in mm) to joint torques (using
     % jacobian?), and apply to omni
     % ========================================================================
 end
-
-
-
