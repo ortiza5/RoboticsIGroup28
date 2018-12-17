@@ -29,27 +29,27 @@ binary_image = ImageProcessing(raw_image);
 
 while(1)
     % Get Phantom Omni initial position to compare against
-    q = callAngles(omni);
+    q = omni.ActualJointAngles
     q = q(1:3);
-    P0T_omniINIT = OmniForwardKinematics(q);
+    P0T_omniINIT = OmniForwardKinematics(q)
     
     % Pause to allow for movement of the Phantom Omni
     pause(.1)
     
     % Get the new position of the Phantom Omni
-    q = callAngles(omni);
+    q = omni.ActualJointAngles
     q = q(1:3);
-    P0T_omniFIN = OmniForwardKinematics(q);
+    P0T_omniFIN = OmniForwardKinematics(q)
     
     % Find change in Phantom Omni position
-    delta_P0T = scale*(P0T_omniFIN - P0T_omniINIT);
+    delta_P0T = scale*(P0T_omniFIN - P0T_omniINIT)
     
     % ========================================================================
     % TODO - Send torque to phantom omni if dobot will go outside the boundary
     % ========================================================================
     
     % Send new position to Dobot
-    angles = GetDobotAngles(dobot);
+    angles = GetDobotAngles(dobot)
     P0T_dobotINIT = DobotForwardKinematics(angles);
     P0T_dobotFIN = P0T_dobotINIT + delta_P0T;
     setPosition(P0T_dobotFIN);
