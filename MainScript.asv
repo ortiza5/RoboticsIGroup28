@@ -11,11 +11,14 @@ scale = 1.5;
 omni = RobotRaconteur.Connect('tcp://127.0.0.1:5150/PhantomOmniSimulinkHost/PhantomOmni')
 dobot = RobotRaconteur.Connect('tcp://localhost:10001/dobotRR/dobotController')
 
-rotz = [cos(-pi/2) -sin(-pi/2) 0; sin(-pi/2) cos(-pi/2) 0; 0 0 1];
+% get Dobot angles when pen is at center position
+angles = GetDobotAngles(dobot)'
+% angles = [0;45;45];
 
 q = omni.ActualJointAngles;
 q = q(1:3);
-P0T_omniORIGINAL = rotz*OmniForwardKinematics(q)
+P0T_omniORIGINAL = OmniForwardKinematics(q)
+P0T_omniORIGINAL(1) = -P0T_omniORIGINAL(1);
 
 angles = [0;0;0];
 POT_dobotORIGINAL = DobotForwardKinematics(angles);
@@ -36,17 +39,16 @@ while(1)
     % Get the new position of the Phantom Omni
     q = omni.ActualJointAngles;
     q = q(1:3);
-    P0T_omniFIN = rotz*OmniForwardKinematics(q);
+    P0T_omniFIN = rotz(pi/2)*OmniForwardKinematics(q);
     
     % ========================================================================
     % TODO - Send torque to phantom omni if dobot will go outside the boundary
     % ========================================================================
     
-    POT_dobotFIN = scale*(P0T_omniFIN-P0T_omniORIGINAL) + POT_dobotORIGINAL;
-    POT_dobotFIN(3) = 0;
+    POT_dobotFIN = scale*(P0T_omniFIN-P0T_omniORIGINAL) + POT_dobotORIGINAL
     
     % Send new position to Dobot
     angles = GetDobotAngles(dobot)';
     P0T_dobotINIT = DobotForwardKinematics(angles);
-    setPosition(POT_dobotFIN,P0T_dobotINIT)
+%     setPosition(POT_dobotFIN,P0T_dobotINIT)
 end
